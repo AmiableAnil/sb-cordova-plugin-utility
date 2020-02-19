@@ -469,10 +469,11 @@ public class UtilityPlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    String fileName = args.getString(1).replace("file:///android_asset/","");
-                    String output = FileUtil.readFileFromAssets(cordova.getActivity().getAssets().open(fileName));
-                    if(output != null){
-                        callbackContext.success(output);
+//                    String fileName = args.getString(1).replace("file:///android_asset/","");
+//                    String output = FileUtil.readFileFromAssets(cordova.getActivity().getAssets().open(fileName));
+                    String tempAssetFilePath = FileUtil.createFileFromAsset(cordova.getActivity(), args.getString(1));
+                    if(tempAssetFilePath != null){
+                        callbackContext.success(tempAssetFilePath);
                     }else{
                         callbackContext.error(0);
                     }

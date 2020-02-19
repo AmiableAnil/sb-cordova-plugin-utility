@@ -1,5 +1,8 @@
 package org.sunbird.config;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +14,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
+
+import io.reactivex.annotations.NonNull;
+
 /**
  * Created by swayangjit on 17/3/19.
  */
@@ -166,5 +172,56 @@ public class FileUtil {
             }
         }
 
+    }
+
+    public static String createFileFromAsset(Context context, String fileName) {
+        try {
+            AssetManager am = context.getAssets();
+            InputStream inputStream = am.open(fileName);
+            // String tempAssetFilePath = getTempLocation(getExternalFilesDir(context), System.currentTimeMillis() + ".ecar").toString();
+            String tempAssetFilePath = getTempLocation(getExternalFilesDir(context), fileName).toString();
+            OutputStream outputStream = new FileOutputStream(tempAssetFilePath);
+            byte buffer[] = new byte[1024];
+            int length = 0;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+            outputStream.close();
+            inputStream.close();
+            return tempAssetFilePath;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static File getTempLocation(File externalFilesDir, String fileName) {
+        createFolders(getTmpDirFilePath(externalFilesDir), "");
+        return new File(getTmpDir(externalFilesDir), fileName);
+    }
+
+    @NonNull
+    public static File getExternalFilesDir(Context context) {
+        File externalFilesDir = context.getExternalFilesDir(null);
+        if (externalFilesDir == null)
+            throw new RuntimeException("External file could not be loaded.");
+        return externalFilesDir;
+    }
+
+    public static void createFolders(String loc, String dir) {
+        File f = new File(loc, dir);
+
+        if (!f.isDirectory()) {
+            f.mkdirs();
+        }
+    }
+
+    public static String getTmpDirFilePath(File externalFilesDir) {
+        File tmpLocation = getTmpDir(externalFilesDir);
+        return tmpLocation.getAbsolutePath();
+    }
+
+    public static File getTmpDir(File externalFilesDir) {
+        return new File(externalFilesDir.getPath() + "/tmp");
     }
 }
